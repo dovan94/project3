@@ -13,12 +13,10 @@ package servlet;
  */
 public class UserBean {
     private String username;
-    private String password;
     private boolean loggedin;
     
     public UserBean() {
         username = "";
-        password = "";
         loggedin = false;
     }
     
@@ -29,14 +27,14 @@ public class UserBean {
         return username;
     }
     
-    public void setPassword(String password) {
-        this.password = password;
+    public void setLoggedIn(boolean status) {
+        loggedin = status;
     }
     public boolean isLoggedin() {
         return loggedin;
     }
     
-    public boolean checkPassword(String username, String newPassword) {
+    public boolean validateUser(String username, String newPassword) {
         String password = "password";
         if (password.equals(newPassword)) {
             loggedin = true;

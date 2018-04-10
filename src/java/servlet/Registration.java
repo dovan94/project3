@@ -1,10 +1,9 @@
-package servlet;
-
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+package servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -18,12 +17,14 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+
 
 /**
  *
  * @author VanDo
  */
-public class Login extends HttpServlet {
+public class Registration extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -38,38 +39,40 @@ public class Login extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        HttpSession session = request.getSession();
-        
+
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        String location = "";
         
         String db_driver = "com.mysql.jdbc.Driver";
         String db_url = "jdbc:mysql://localhost:3306/project3";
         String db_user = "root";
         String db_password = "Venusdo94!";
+        
         try {
             Class.forName(db_driver);
         } catch(ClassNotFoundException e) {
             e.printStackTrace();
-        }   
+        }
         
         try {
             // Connect to database
             Connection conn = DriverManager.getConnection(db_url, db_user, db_password);
             Statement stm = conn.createStatement();
-            String query = "SELECT * FROM User WHERE username = \"" + username + "\" AND password = \"" + password + "\"";
+            String query = "SELECT * FROM User WHERE username = \"" + username + "\"";
             ResultSet result = stm.executeQuery(query);
-            if (result.last()) {
-                UserBean userBean = new UserBean();
-                userBean.setUsername(username);
-                userBean.setLoggedIn(true);
-                location = "inventory.jsp";
-                session.setAttribute("userBean", userBean);
-                response.sendRedirect(location);
+            // if username doesn't exist in database
+            if (!result.last()) {
+                String query2 = "INSERT INTO User(username, password) values (?, ?)";
+                PreparedStatement ps = conn.prepareStatement(query2);
+                ps.setString(1, username);
+                ps.setString(2, password);
+                ps.execute();
+                
+                request.setAttribute("message", "success");
+                request.getRequestDispatcher("registration.jsp").forward(request, response);
             } else {
-                request.setAttribute("message", "Invalid username and/or password");
-                request.getRequestDispatcher("login.jsp").forward(request, response);
+                request.setAttribute("message", "fail");
+                request.getRequestDispatcher("registration.jsp").forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
