@@ -4,7 +4,6 @@
     Author     : VanDo
 --%>
 
-<%@page import="java.io.PrintWriter"%>
 <%@page import="servlet.UserBean"%>
 
 <%@page import="java.sql.DriverManager"%>
@@ -15,7 +14,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <% 
     UserBean userBean = (UserBean)session.getAttribute("userBean"); 
-    PrintWriter printer = response.getWriter();
     
     String db_driver = "com.mysql.jdbc.Driver";
     String db_url = "jdbc:mysql://localhost:3306/";
@@ -120,7 +118,6 @@
         </div>
  
         <div class="container">
-            
             <div class="row text-center" style="display:flex; flex-wrap:wrap;">
 
         <%
