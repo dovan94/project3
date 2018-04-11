@@ -64,6 +64,7 @@ public class Controller extends HttpServlet {
                 break;
             case "checkout":
                 location = "checkout.jsp";
+                break;
             default:
                 location = "index.html";
         }
