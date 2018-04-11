@@ -1,10 +1,9 @@
-package servlet;
-
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+package servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,18 +11,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 /**
  *
  * @author VanDo
  */
-public class Login extends HttpServlet {
+public class Cart extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -38,10 +37,10 @@ public class Login extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        HttpSession session = request.getSession();
+        UserBean userBean = (UserBean)request.getSession(false).getAttribute("userBean");
+        Integer movieId = Integer.parseInt(request.getParameter("movie"));
+        Integer userId = userBean.getId();
         
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
         String location = "";
         
         String db_driver = "com.mysql.jdbc.Driver";
@@ -52,29 +51,33 @@ public class Login extends HttpServlet {
             Class.forName(db_driver);
         } catch(ClassNotFoundException e) {
             e.printStackTrace();
-        }   
+        }  
         
         try {
             // Connect to database
             Connection conn = DriverManager.getConnection(db_url, db_user, db_password);
             Statement stm = conn.createStatement();
-            String query = "SELECT * FROM User WHERE username = \"" + username + "\" AND password = \"" + password + "\"";
+            String query = "SELECT * FROM Cart where product_id = " + movieId + " AND user_id = " + userId;
             ResultSet result = stm.executeQuery(query);
-            if (result.last()) {
-                UserBean userBean = new UserBean();
-                userBean.setUsername(username);
-                userBean.setId(Integer.parseInt(result.getString("id")));
-                userBean.setLoggedIn(true);
-                location = "inventory.jsp";
-                session.setAttribute("userBean", userBean);
-                response.sendRedirect(location);
+            if(!result.last()) {
+                String query2 = "INSERT INTO Cart(product_id, user_id, quantity) values (?, ?, ?)";
+                PreparedStatement ps = conn.prepareStatement(query2);
+                ps.setInt(1, movieId);
+                ps.setInt(2, userId);
+                ps.setInt(3, 1);
+                ps.execute();
+
+                request.setAttribute("message", "success");
+                request.getRequestDispatcher("inventory.jsp").forward(request, response);
             } else {
-                request.setAttribute("message", "Invalid username and/or password");
-                request.getRequestDispatcher("login.jsp").forward(request, response);
+                request.setAttribute("message", "fail");
+                request.getRequestDispatcher("inventory.jsp").forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -1,10 +1,35 @@
 <%-- 
     Document   : checkout
-    Created on : Apr 9, 2018, 5:54:39 PM
+    Created on : Apr 10, 2018, 11:17:27 PM
     Author     : VanDo
 --%>
 
+<%@page import="servlet.UserBean"%>
+
+<%@page import="java.sql.DriverManager"%>
+<%@page import="java.sql.ResultSet"%>
+<%@page import="java.sql.Statement"%>
+<%@page import="java.sql.Connection"%>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<% 
+    UserBean userBean = (UserBean)session.getAttribute("userBean"); 
+    if (userBean == null) { response.sendRedirect("login.jsp"); }
+    
+    String db_driver = "com.mysql.jdbc.Driver";
+    String db_url = "jdbc:mysql://localhost:3306/";
+    String db_name = "project3";
+    String db_user = "root";
+    String db_password = "Venusdo94!";
+    try {
+        Class.forName(db_driver);
+    } catch(ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+    Connection conn = null;
+    Statement stm = null;
+    ResultSet results = null;
+%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -39,6 +64,26 @@
                 font-family: "Lucida Console", Monaco, monospace;
                 font-weight: bold;
             }
+            .container {
+                /*margin-top: 3%;*/
+            }
+            medium {
+                margin-left: 5%;
+            }
+            table, tr, th, td {
+                border-color: #e6e6e6;
+                border-left: none;
+                border-right: none;
+            }
+            #subtotal {
+                font-family: "Comic Sans MS", cursive, sans-serif;
+                font-size: 20pt;
+            }
+            button {
+                margin: 3% 40%;
+                background-color: #3d5c5c !important;
+                border-color: #3d5c5c !important;
+            }
         </style>
         
     </head>
@@ -69,9 +114,53 @@
                 </ul>
             </div>
         </nav>
+        <h1 style="margin-left:7%; margin-top:2%;">Checkout!</h1>
         <div class="container">
-            <h1>Checkout page!</h1>
+            <table border="1" cellpadding="8" width="90%" style="margin-top:3%; margin-left:auto; margin-right:auto;">
+                <tr>
+                    <th style="padding-left:25%;">Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                </tr>
+            <% try { 
+                Integer userId = userBean.getId();
+            
+                conn = DriverManager.getConnection(db_url + db_name, db_user, db_password);
+                stm = conn.createStatement();
+                String query = "SELECT DVD.name, DVD.price, DVD.image, Cart.quantity FROM DVD JOIN Cart "
+                             + "ON DVD.id = Cart.product_id WHERE Cart.user_id = " + userId; 
+                results = stm.executeQuery(query);
+                int subtotal = 0;
+                while(results.next()) {  
+                    subtotal += Integer.parseInt(results.getString("price"));
+            %>
+                    <tr>
+                        <td>
+                            <img src="<%= results.getString("image") %>" style="height:70%;"/>
+                            <medium><%= results.getString("name") %></medium>
+                        </td>
+                        <td><%= results.getString("quantity") %></td>
+                        <td>$<%= results.getString("price") %></td>
+                        
+                    </tr>
+            
+            <%  } //while %>
+                <tr id="subtotal">
+                    <td></td>
+                    <td>Subtotal:</td>
+                    <td>$<% out.print(subtotal); %></td>
+                </tr>
+            <% 
+                } catch (Exception e) {
+                e.printStackTrace();
+             } %>
+            </table>
+            <form action="ProcessOrder" method="POST">
+                <button type="submit" class="btn btn-primary btn-lg" name="id" value="<%=userBean.getId()%>">Submit Order</button>
+            </form>
+            
         </div>
         
     </body>
 </html>
+

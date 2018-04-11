@@ -8,6 +8,14 @@
         <servlet-name>Registration</servlet-name>
         <servlet-class>servlet.Registration</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Cart</servlet-name>
+        <servlet-class>servlet.Cart</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ProcessOrder</servlet-name>
+        <servlet-class>servlet.ProcessOrder</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Login</servlet-name>
         <url-pattern>/Login</url-pattern>
@@ -15,6 +23,14 @@
     <servlet-mapping>
         <servlet-name>Registration</servlet-name>
         <url-pattern>/Registration</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Cart</servlet-name>
+        <url-pattern>/Cart</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProcessOrder</servlet-name>
+        <url-pattern>/ProcessOrder</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

@@ -1,6 +1,6 @@
 <%-- 
-    Document   : welcome
-    Created on : Apr 8, 2018, 1:39:26 PM
+    Document   : inventory
+    Created on : Apr 10, 2018, 11:18:29 PM
     Author     : VanDo
 --%>
 
@@ -14,7 +14,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <% 
     UserBean userBean = (UserBean)session.getAttribute("userBean"); 
-    
+    if (userBean == null) { response.sendRedirect("login.jsp"); }
     String db_driver = "com.mysql.jdbc.Driver";
     String db_url = "jdbc:mysql://localhost:3306/";
     String db_name = "project3";
@@ -76,7 +76,7 @@
                 border-right: 1px solid #d9d9d9;
             }
             .item {
-                padding: 10px;
+                padding: 15px;
             }
             .closebtn {
                 margin-left: 15px;
@@ -96,6 +96,10 @@
                 width: 25%;
                 margin: 1% auto;
                 text-align: center;
+            }
+            button {
+                background-color: #3d5c5c !important;
+                border-color: #3d5c5c !important;
             }
         </style>
     </head>
@@ -127,16 +131,25 @@
             </div>
         </nav>
         
-        <div class="alert alert-success">
-            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-            Welcome back, <%= userBean.getUsername() %>
-        </div>
+        <% if(null != request.getAttribute("message")) { 
+              String message = (String)request.getAttribute("message");
+              if (message.equals("success")) {
+        %>
+                <div class="alert alert-success">Added to cart!</div>
+        <%    } else { %>
+                <div class="alert alert-info">Item already exists in cart!</div>
+        <%    }
+            } else { %>
+                <div class="alert alert-success">
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                    Welcome back, <%= userBean.getUsername() %>
+                </div>
+        <%  } %>
  
         <div class="container">
             <div class="row text-center" style="display:flex; flex-wrap:wrap;">
 
-        <%
-            try {
+        <%  try {
                 conn = DriverManager.getConnection(db_url + db_name, db_user, db_password);
                 stm = conn.createStatement();
                 String query = "SELECT * FROM DVD";
@@ -150,11 +163,14 @@
                         <img src="<%= results.getString("image") %>" class="img-thumbnail" style="height:200px;"/>
                         <small style="display: block; margin-top: 5px;"><i><%= results.getString("name") %></i></small>
                         <small>$<%= results.getString("price") %></small>
+                        <form action="Cart" method="POST">
+                            <button type="submit" class="btn btn-primary btn-sm"
+                                    name="movie" value="<%= results.getString("id") %>">Add To Cart</button>
+                        </form>
                     </div>
                 </div>
                     
-        <%
-                }
+        <%      }
             } catch(Exception e) {
                 e.printStackTrace();
             }
@@ -164,3 +180,4 @@
        
     </body>
 </html>
+

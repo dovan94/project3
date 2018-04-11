@@ -84,9 +84,9 @@
         </nav>
         
         <% if (null != request.getAttribute("message")) { %>
-                <div class="alert alert-danger">
-                    <%= request.getAttribute("message") %>
-                </div>
+            <div class="alert alert-danger">
+                <%= request.getAttribute("message") %>
+            </div>
         <% } %>
                 
         <div class="container">
