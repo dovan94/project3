@@ -19,6 +19,7 @@
     String db_url = "jdbc:mysql://localhost:3306/";
     String db_name = "project3";
     String db_user = "root";
+//    String db_password = "";
     String db_password = "Venusdo94!";
     try {
         Class.forName(db_driver);

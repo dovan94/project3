@@ -47,6 +47,7 @@ public class Login extends HttpServlet {
         String db_driver = "com.mysql.jdbc.Driver";
         String db_url = "jdbc:mysql://localhost:3306/project3";
         String db_user = "root";
+//        String db_password = "";
         String db_password = "Venusdo94!";
         try {
             Class.forName(db_driver);
